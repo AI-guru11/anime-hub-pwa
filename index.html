@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Anime Hub — Cinematic Worlds</title>
+
+  <meta name="theme-color" content="#050505" />
+  <meta name="description" content="Anime Hub — اكتشف عوالم الأنمي بتجربة سينمائية." />
+
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="stylesheet" href="./styles.css" />
+  <!-- أيقونة الموقع -->
+  <link rel="icon" href="./icons/icon-192.png" />
+
+  <!-- تحميل التطبيق -->
+  <script src="./app.js"></script>
+</head>
+
+<body>
+  <!-- تخطي إلى المحتوى لسهولة الوصول -->
+  <a class="skip-link" href="#main">تخطي إلى المحتوى</a>
+
+  <!-- الشريط العلوي (شفاف وعائم) -->
+  <header class="topbar" role="banner">
+    <div class="topbar__left">
+      <div class="brand" aria-label="Anime Hub">
+        <span class="brand__mark" aria-hidden="true"></span>
+        <span class="brand__name">ANIME HUB</span>
+      </div>
+    </div>
+
+    <div class="topbar__center">
+      <label class="search" aria-label="بحث">
+        <span class="search__icon" aria-hidden="true">
+            <!-- أيقونة بحث بسيطة -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </span>
+        <input id="searchInput" type="search" placeholder="ابحث في العوالم..." autocomplete="off" />
+      </label>
+    </div>
+
+    <div class="topbar__right">
+      <button class="icon-btn" id="cartBtn" type="button" aria-label="السلة">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="badge" id="cartCount" aria-label="عدد العناصر">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- منطقة العرض الرئيسية (يتم حقن الصفحات هنا) -->
+  <main id="main" class="app" role="main">
+    <div id="viewRoot"></div>
+  </main>
+
+  <!-- شريط التنقل السفلي (مخصص للجوال) -->
+  <nav class="bottom-nav" aria-label="التنقل السفلي">
+    <button class="bn-item" type="button" data-nav="hub" aria-label="الرئيسية">
+      <span class="bn-ic"><svg class="bn-svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+      <span class="bn-tx">Home</span>
+    </button>
+    <button class="bn-item" type="button" data-nav="worlds" aria-label="العوالم">
+      <span class="bn-ic"><svg class="bn-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+      <span class="bn-tx">Worlds</span>
+    </button>
+    <button class="bn-item" type="button" data-nav="cart" aria-label="السلة">
+      <span class="bn-ic"><svg class="bn-svg" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>
+      <span class="bn-tx">Cart</span>
+    </button>
+  </nav>
+
+  <!-- Bottom Sheet (للمعاينة السريعة للعالم) -->
+  <div class="sheet" id="worldSheet" aria-hidden="true">
+    <div class="sheet__backdrop" id="sheetBackdrop"></div>
+    <section class="sheet__panel" role="dialog" aria-modal="true" aria-label="معاينة العالم">
+      <div class="sheet__handle" aria-hidden="true"></div>
+      <header class="sheet__header">
+        <div class="sheet__title-wrap">
+          <div class="pill" id="sheetPill">WORLD</div>
+          <h2 class="sheet__title" id="sheetTitle">World</h2>
+          <p class="sheet__subtitle" id="sheetSubtitle">Preview</p>
+        </div>
+        <button class="icon-btn sheet__close" id="sheetCloseBtn" type="button" aria-label="إغلاق">✕</button>
+      </header>
+      <div class="sheet__content">
+        <div class="mini-grid" id="sheetMiniGrid"></div>
+        <div class="sheet__cta">
+          <button class="btn btn--primary" id="sheetEnterBtn" type="button">دخول العالم</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal (للمنتجات والعرض السريع) -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="modal__backdrop" id="modalBackdrop"></div>
+    <section class="modal__panel" role="dialog" aria-modal="true">
+      <header class="modal__header">
+        <h3 class="modal__title" id="modalTitle">Product</h3>
+        <button class="icon-btn" id="modalCloseBtn" type="button" aria-label="إغلاق">✕</button>
+      </header>
+      <div class="modal__content" id="modalContent"></div>
+    </section>
+  </div>
+
+  <!-- التنبيهات (Toasts) -->
+  <div class="toast-host" id="toastHost" aria-live="polite"></div>
+</body>
+</html>
+

@@ -1,0 +1,292 @@
+/* =========================================
+   Anime Hub — Cinematic Dark System
+   ========================================= */
+
+:root {
+  /* ألوان الخلفية السينمائية */
+  --bg: #050505;       /* أسود عميق جداً */
+  --panel: #121212;    /* لون البطاقات */
+  --stroke: rgba(255,255,255,0.08); /* حدود خفيفة جداً */
+  --text: #ffffff;
+  --muted: rgba(255,255,255,0.6);
+  
+  /* ألوان التمييز (تتغير حسب العالم) */
+  --accent: #ff9800; 
+
+  /* الأبعاد */
+  --radius: 16px;
+  --header-h: 60px;
+  --bn-h: 70px;
+  
+  /* المناطق الآمنة للجوال */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; width: 100%; overflow-x: hidden; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* نمط ضوضاء خفيف جداً لتقليل التدرج اللوني السيء */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* --- تخطي الرابط (Accessibility) --- */
+.skip-link {
+  position: absolute; top: -100px; left: 10px; background: var(--accent); color: #000; padding: 10px; z-index: 999;
+}
+.skip-link:focus { top: 10px; }
+
+/* --- الشريط العلوي (Cinematic Header) --- */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(10px + var(--sat)) 16px 10px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  pointer-events: none; /* للسماح باللمس تحته */
+}
+.topbar > * { pointer-events: auto; } /* تفعيل الأزرار فقط */
+
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: 1px; font-size: 18px; }
+.brand__mark { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
+
+/* حقل البحث */
+.search {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 8px 12px;
+  display: flex; align-items: center; gap: 8px;
+  width: 160px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: width 0.3s ease;
+}
+.search:focus-within { width: 200px; background: rgba(0,0,0,0.8); border-color: var(--accent); }
+.search input { border: none; background: transparent; color: white; width: 100%; outline: none; font-size: 14px; }
+.search__icon { color: var(--muted); }
+
+.icon-btn {
+  background: rgba(255,255,255,0.1);
+  border: none; color: white;
+  width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+.badge {
+  position: absolute; top: -2px; right: -2px;
+  background: var(--accent); color: #000;
+  font-size: 10px; font-weight: bold;
+  padding: 2px 5px; border-radius: 10px;
+}
+
+/* --- Hero Slider (الميزة الجديدة) --- */
+.hero-slider-container {
+  position: relative;
+  width: 100%;
+  height: 65vh; /* ارتفاع سينمائي */
+  min-height: 400px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+/* الظل السينمائي من الأسفل */
+.hero-slider-container::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(0deg, var(--bg) 5%, transparent 60%, rgba(0,0,0,0.6) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-slider {
+  display: flex;
+  height: 100%;
+  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.slide {
+  min-width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 20px 20px 80px; /* مساحة للنص في الأسفل */
+}
+
+.slide__bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  z-index: 1;
+  /* فلتر لتحسين ألوان الصور تلقائياً */
+  filter: saturate(1.1) brightness(0.9);
+}
+
+.slide__content {
+  position: relative; z-index: 3;
+  max-width: 600px;
+  transform: translateY(20px); opacity: 0;
+  transition: all 0.6s ease 0.3s;
+}
+.slide.active .slide__content { transform: translateY(0); opacity: 1; }
+
+.slide__tag {
+  display: inline-block; padding: 4px 12px;
+  background: var(--accent); color: #000;
+  font-size: 12px; font-weight: bold; border-radius: 4px;
+  margin-bottom: 8px; text-transform: uppercase;
+}
+.slide__title {
+  font-size: 32px; font-weight: 900; margin: 0 0 8px;
+  line-height: 1.1; text-transform: uppercase;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+}
+.slide__desc {
+  font-size: 14px; color: rgba(255,255,255,0.9);
+  margin: 0 0 16px; max-width: 90%;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+.slide__btn {
+  background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white; padding: 10px 24px; border-radius: 30px;
+  font-weight: bold; cursor: pointer;
+  transition: background 0.3s;
+}
+.slide__btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+/* نقاط التنقل للسلايدر */
+.slider-dots {
+  position: absolute; bottom: 30px; left: 20px; z-index: 10;
+  display: flex; gap: 8px;
+}
+.dot {
+  width: 6px; height: 6px; background: rgba(255,255,255,0.3);
+  border-radius: 50%; transition: all 0.3s;
+}
+.dot.active { width: 20px; background: var(--accent); border-radius: 10px; }
+
+/* --- الأقسام والعناوين --- */
+.section { padding: 0 16px; margin-bottom: 40px; position: relative; z-index: 3; }
+.section__head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+.section__title { font-size: 18px; font-weight: 700; margin: 0; border-left: 3px solid var(--accent); padding-left: 10px; }
+.section__link { font-size: 12px; color: var(--accent); text-decoration: none; }
+
+/* --- شريط العوالم (World Strip) --- */
+.world-strip {
+  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+}
+.world-pill {
+  flex: 0 0 auto; scroll-snap-align: start;
+  display: flex; align-items: center; gap: 10px;
+  background: #1a1a1a; padding: 8px 16px 8px 8px;
+  border-radius: 50px; border: 1px solid var(--stroke);
+  cursor: pointer; transition: transform 0.2s;
+}
+.world-pill:hover { border-color: var(--accent); transform: scale(1.05); }
+.world-pill img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.world-pill span { font-size: 13px; font-weight: 600; color: #fff; }
+
+/* --- بطاقات المنتجات (Poster Style) --- */
+.h-scroll { display: flex; gap: 16px; overflow-x: auto; padding: 4px 4px 20px; scroll-snap-type: x mandatory; }
+.pcard {
+  flex: 0 0 160px; scroll-snap-align: start;
+  background: var(--panel); border-radius: 12px;
+  overflow: hidden; border: 1px solid var(--stroke);
+  position: relative; transition: transform 0.3s;
+}
+.pcard:hover { transform: translateY(-5px); border-color: var(--accent); }
+.pcard__img-wrap { position: relative; width: 100%; aspect-ratio: 3/4; overflow: hidden; }
+.pcard__img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.pcard:hover .pcard__img { transform: scale(1.1); }
+.pcard__info { padding: 12px; }
+.pcard__title { font-size: 14px; margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pcard__price { color: var(--accent); font-weight: bold; font-size: 13px; }
+.tag-360 {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(0,0,0,0.7); color: white;
+  font-size: 10px; padding: 2px 6px; border-radius: 4px;
+  backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* --- شبكة العوالم (World Grid) --- */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.wcard {
+  aspect-ratio: 16/9; border-radius: 12px; overflow: hidden;
+  position: relative; cursor: pointer; border: 1px solid var(--stroke);
+}
+.wcard__bg { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+.wcard:hover .wcard__bg { transform: scale(1.1); }
+.wcard__overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 80%);
+  display: flex; align-items: flex-end; padding: 12px;
+}
+.wcard__title { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+/* --- التنقل السفلي --- */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(10,10,10,0.9); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--stroke);
+  display: flex; justify-content: space-around;
+  padding: 10px 0 calc(10px + var(--sab));
+  z-index: 100;
+}
+.bn-item {
+  background: none; border: none; color: var(--muted);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.bn-item[aria-current="page"] { color: var(--accent); }
+.bn-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+/* --- تفاصيل المنتج والصفحات الداخلية --- */
+.product-hero { position: relative; height: 50vh; overflow: hidden; }
+.product-hero__img { width: 100%; height: 100%; object-fit: cover; }
+.product-hero::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(0deg, var(--bg) 0%, transparent 100%);
+}
+.product-details { padding: 20px; margin-top: -60px; position: relative; z-index: 5; }
+.pd-title { font-size: 28px; font-weight: 800; margin: 0 0 10px; line-height: 1.2; }
+.pd-price { font-size: 24px; color: var(--accent); font-weight: bold; margin-bottom: 20px; display: block; }
+.btn--primary {
+  width: 100%; background: var(--accent); color: #000;
+  border: none; padding: 16px; border-radius: 12px;
+  font-weight: bold; font-size: 16px; margin-bottom: 10px;
+}
+.btn--ghost {
+  width: 100%; background: transparent; color: white;
+  border: 1px solid var(--stroke); padding: 16px; border-radius: 12px;
+}
+
+/* --- Bottom Sheet & Modal --- */
+.sheet, .modal { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
+.sheet[aria-hidden="false"], .modal[aria-hidden="false"] { pointer-events: auto; }
+.sheet__backdrop, .modal__backdrop {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.8);
+  opacity: 0; transition: opacity 0.3s;
+}
+.sheet[aria-hidden="false"] .sheet__backdrop, .modal[aria-hidden="false"] .modal__backdrop { opacity: 1; }
+.sheet__panel {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: #151515; border-radius: 20px 20px 0 0;
+  padding: 20px 20px 40px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-top: 1px solid var(--stroke);
+}
+.sheet[aria-hidden="false"] .sheet__panel { transform: translateY(0); }
+.mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+.mini { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; font-size: 12px; }
+
+/* --- 360 Viewer --- */
+.viewer-stage {
+  width: 100%; aspect-ratio: 1/1; background: #111;
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; border: 1px solid var(--stroke); position: relative;
+}
+.viewer-stage img { max-width: 80%; max-height: 80%; }
+
